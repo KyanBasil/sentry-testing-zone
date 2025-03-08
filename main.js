@@ -3,25 +3,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize UI elements and event handlers
     setupEventListeners();
     
-    // Welcome message
-    logActivity('Welcome to Sentry.io Testing Zone', 'info');
-    
-    // We'll delay this message until after we check for Sentry availability
+    // Wait a moment and then test with a manual capture
     setTimeout(function() {
         if (typeof Sentry !== 'undefined') {
-            logActivity('Sentry SDK detected. Click "Initialize Sentry" to confirm it\'s working', 'info');
-        } else {
-            logActivity('Sentry SDK not detected. Check console for errors.', 'warning');
+            try {
+                // Capture a message to test if Sentry is working
+                Sentry.captureMessage("Sentry Testing Zone - Initialization Test");
+                console.log("Sent test message to Sentry");
+            } catch (e) {
+                console.error("Error testing Sentry:", e);
+            }
         }
-    }, 1000); // Small delay to allow scripts to load
+    }, 1500);
 });
 
 // Set up all event listeners
 function setupEventListeners() {
-    // Sentry initialization button
+    // Sentry initialization confirmation
     document.getElementById('initialize-sentry').addEventListener('click', function() {
-        // This confirms Sentry is working and sets the initialized flag
-        initializeSentry('embedded-dsn');
+        // This confirms Sentry is working and sends a test message
+        initializeSentry('direct-dsn');
     });
     
     // Error trigger buttons
@@ -93,14 +94,21 @@ function setupEventListeners() {
 
 // Map error type to trigger function
 function triggerErrorByType(errorType) {
-    // Check if Sentry is initialized before proceeding
-    if (!checkSentryInitialized()) {
-        logActivity('Please initialize Sentry first', 'warning');
+    // Check if Sentry is available before proceeding
+    if (typeof Sentry === 'undefined') {
+        logActivity('Sentry SDK not available. Cannot send errors.', 'error');
         return;
     }
     
     // Add a breadcrumb for the error trigger action
-    addBreadcrumb(`User triggered ${errorType} error`, 'user-action');
+    Sentry.addBreadcrumb({
+        message: `User triggered ${errorType} error`,
+        category: 'user-action',
+        level: 'info'
+    });
+    
+    // Log the action
+    logActivity(`Triggering ${errorType} error...`, 'info');
     
     // Call the appropriate error trigger function
     switch (errorType) {
