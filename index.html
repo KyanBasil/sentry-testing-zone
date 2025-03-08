@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentry.io Testing Zone</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Import Sentry SDK -->
+    <script src="https://browser.sentry-cdn.com/7.69.0/bundle.min.js" integrity="sha384-R5Nb6yzGT3TTV0d/zMbWl4yajIUMd6n3EcRDPicrjnLRt7bCpHtgxoZVXVg9j1G" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Sentry.io Testing Zone</h1>
+            <p>A playground for testing various error types and Sentry monitoring features</p>
+        </header>
+
+        <section class="config-section">
+            <h2>Configuration</h2>
+            <div class="form-group">
+                <label for="dsn-input">Sentry DSN:</label>
+                <input type="text" id="dsn-input" placeholder="https://your-dsn-here@sentry.io/your-project">
+            </div>
+            <button id="initialize-sentry">Initialize Sentry</button>
+            <div id="init-status">Status: <span>Not initialized</span></div>
+        </section>
+
+        <section class="error-section">
+            <h2>Error Types</h2>
+            <div class="error-cards">
+                <div class="error-card">
+                    <h3>JavaScript Exceptions</h3>
+                    <button class="trigger-btn" data-error-type="reference">Reference Error</button>
+                    <button class="trigger-btn" data-error-type="type">Type Error</button>
+                    <button class="trigger-btn" data-error-type="syntax">Syntax Error</button>
+                    <button class="trigger-btn" data-error-type="range">Range Error</button>
+                </div>
+
+                <div class="error-card">
+                    <h3>Custom Errors</h3>
+                    <button class="trigger-btn" data-error-type="custom">Throw Custom Error</button>
+                    <div class="form-group">
+                        <input type="text" id="custom-error-message" placeholder="Custom error message">
+                    </div>
+                </div>
+
+                <div class="error-card">
+                    <h3>Promise Rejections</h3>
+                    <button class="trigger-btn" data-error-type="promise">Unhandled Promise</button>
+                    <button class="trigger-btn" data-error-type="async">Async Function Error</button>
+                </div>
+
+                <div class="error-card">
+                    <h3>Network & API Errors</h3>
+                    <button class="trigger-btn" data-error-type="fetch">Fetch Error</button>
+                    <button class="trigger-btn" data-error-type="xhr">XHR Error</button>
+                </div>
+
+                <div class="error-card">
+                    <h3>Performance Issues</h3>
+                    <button class="trigger-btn" data-error-type="memory">Memory Leak</button>
+                    <button class="trigger-btn" data-error-type="cpu">CPU Spike</button>
+                    <button class="trigger-btn" data-error-type="slowfunc">Slow Function</button>
+                </div>
+
+                <div class="error-card">
+                    <h3>DOM & UI Errors</h3>
+                    <button class="trigger-btn" data-error-type="dom">DOM Exception</button>
+                    <button class="trigger-btn" data-error-type="animation">Animation Error</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="context-section">
+            <h2>Context & Breadcrumbs</h2>
+            <div class="context-cards">
+                <div class="context-card">
+                    <h3>User Context</h3>
+                    <div class="form-group">
+                        <label for="user-id">User ID:</label>
+                        <input type="text" id="user-id" placeholder="test-user-123">
+                    </div>
+                    <div class="form-group">
+                        <label for="user-email">Email:</label>
+                        <input type="email" id="user-email" placeholder="user@example.com">
+                    </div>
+                    <button id="set-user">Set User Context</button>
+                </div>
+
+                <div class="context-card">
+                    <h3>Tags & Extra Data</h3>
+                    <div class="form-group">
+                        <label for="tag-key">Tag Key:</label>
+                        <input type="text" id="tag-key" placeholder="environment">
+                    </div>
+                    <div class="form-group">
+                        <label for="tag-value">Tag Value:</label>
+                        <input type="text" id="tag-value" placeholder="testing">
+                    </div>
+                    <button id="set-tag">Set Tag</button>
+                </div>
+
+                <div class="context-card">
+                    <h3>Add Breadcrumb</h3>
+                    <div class="form-group">
+                        <label for="breadcrumb-message">Message:</label>
+                        <input type="text" id="breadcrumb-message" placeholder="User clicked button">
+                    </div>
+                    <div class="form-group">
+                        <label for="breadcrumb-category">Category:</label>
+                        <input type="text" id="breadcrumb-category" placeholder="ui.click">
+                    </div>
+                    <button id="add-breadcrumb">Add Breadcrumb</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="transaction-section">
+            <h2>Transactions & Spans</h2>
+            <button id="start-transaction">Start New Transaction</button>
+            <button id="add-span">Add Span to Transaction</button>
+            <button id="finish-transaction">Finish Transaction</button>
+        </section>
+
+        <section class="log-section">
+            <h2>Activity Log</h2>
+            <div id="activity-log"></div>
+            <button id="clear-log">Clear Log</button>
+        </section>
+    </div>
+
+    <footer>
+        <p>Sentry.io Testing Zone - <a href="https://github.com/KyanBasil/sentry-testing-zone" target="_blank">GitHub Repository</a></p>
+    </footer>
+
+    <script src="sentry-config.js"></script>
+    <script src="error-triggers.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
