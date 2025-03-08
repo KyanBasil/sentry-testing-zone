@@ -1,70 +1,93 @@
-# Sentry.io Testing Zone
+# Sentry.io Python Testing Zone
 
-A simple web application designed to help test and demonstrate Sentry.io's error monitoring and performance tracking capabilities.
+A simple Flask web application designed to help test and demonstrate Sentry.io's error monitoring and performance tracking capabilities with Python integration.
 
 ## Features
 
-- Test various types of JavaScript errors and see how they're captured in Sentry
+- Test various types of Python exceptions and see how they're captured in Sentry
 - Trigger performance issues for monitoring
 - Add custom context, tags, and breadcrumbs
 - Create and monitor transactions and spans
-- Simple, user-friendly interface
+- Simple, user-friendly web interface
+
+## Prerequisites
+
+- Python 3.7+
+- pip (Python package manager)
+
+## Installation
+
+1. Clone this repository:
+```bash
+git clone https://github.com/KyanBasil/sentry-testing-zone.git
+cd sentry-testing-zone
+```
+
+2. Create a virtual environment (optional but recommended):
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows, use: venv\Scripts\activate
+```
+
+3. Install the required dependencies:
+```bash
+pip install -r requirements.txt
+```
 
 ## Usage
 
-1. Clone this repository
-2. Open `index.html` in your browser
-3. Enter your Sentry DSN (can be found in your Sentry project settings)
-4. Click "Initialize Sentry"
-5. Use the various buttons to trigger different types of errors and monitoring features
+1. Run the Flask application:
+```bash
+python app.py
+```
+
+2. Open your web browser and navigate to:
+```
+http://localhost:5000
+```
+
+3. Use the web interface to test different Sentry features:
+   - Click "Test Sentry Connection" to confirm integration is working
+   - Trigger various error types to see how they're captured
+   - Set user context, tags, and breadcrumbs
+   - Create transactions and spans for performance monitoring
 
 ## Error Types
 
 This application can generate the following types of errors:
 
-### JavaScript Exceptions
-- Reference Error
+### Python Exceptions
+- Division by Zero
+- Index Error
+- Key Error
+- Name Error
 - Type Error
-- Syntax Error
-- Range Error
-
-### Custom Errors
-- Custom error with metadata
-
-### Promise Rejections
-- Unhandled Promise rejection
-- Async function error
-
-### Network & API Errors
-- Fetch Error
-- XHR Error
+- Attribute Error
+- Import Error
+- Custom Exception
 
 ### Performance Issues
-- Memory Leak simulation
-- CPU Spike simulation
-- Slow Function execution
+- Recursive Function Calls
+- Memory-Intensive Operations
+- Slow Requests
 
-### DOM & UI Errors
-- DOM Exception
-- Animation Error
+## Sentry Features
 
-## Context & Monitoring Features
+The application demonstrates these Sentry features:
 
-The application also allows you to test these Sentry features:
-
+- Exception monitoring
 - User context setting
-- Adding tags 
-- Creating breadcrumbs
+- Tags & custom attributes
+- Breadcrumbs
 - Performance monitoring with transactions and spans
 
-## Getting a Sentry DSN
+## Sentry Configuration
 
-To use this application, you'll need a Sentry DSN (Data Source Name):
+The application is pre-configured with a Sentry DSN. If you want to use your own Sentry project:
 
-1. Sign up or log in to [Sentry.io](https://sentry.io/)
-2. Create a new project or use an existing one
-3. Go to Project Settings > Client Keys (DSN)
-4. Copy your DSN, which will look like: `https://examplePublicKey@o0.ingest.sentry.io/0`
+1. Create a new project in your Sentry account
+2. Get your DSN from the project settings
+3. Update the DSN in `app.py`
 
 ## Contributing
 
