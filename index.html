@@ -4,29 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sentry.io Testing Zone</title>
-    <!-- Sentry.io SDK with embedded DSN -->
+    
+    <!-- Sentry.io SDK with embedded DSN - This must be the first script -->
     <script
       src="https://js.sentry-cdn.com/96ceb78f1b707f3de3290628be7fdf3e.min.js"
       crossorigin="anonymous"
     ></script>
-    <!-- Sentry initialization -->
+    
+    <!-- Sentry initialization - Must come right after the SDK -->
     <script>
+      window.onSentryLoaded = function() {
+        console.log('Sentry loaded callback executed!');
+      };
+      
       Sentry.onLoad(function() {
+        console.log('Sentry.onLoad callback executed!');
+        
         Sentry.init({
-          // Additional configuration for Sentry
           debug: true,
           environment: 'testing',
           release: 'sentry-testing-zone@1.0.0',
           tracesSampleRate: 1.0,
           replaysSessionSampleRate: 1.0,
-          replaysOnErrorSampleRate: 1.0
+          replaysOnErrorSampleRate: 1.0,
+          
+          // We'll make a global window variable to check in our scripts
+          beforeSend: function(event) {
+            window.sentryIsReady = true;
+            console.log('Sentry initialized and ready to capture events!');
+            return event;
+          }
         });
-        console.log('Sentry initialized via onLoad!');
+        
+        // Call our callback
+        if (window.onSentryLoaded) {
+          window.onSentryLoaded();
+        }
       });
     </script>
+    
     <link rel="stylesheet" href="styles.css">
-    <!-- Backup Sentry SDK (if needed) -->
-    <!-- <script src="https://browser.sentry-cdn.com/7.69.0/bundle.min.js" integrity="sha384-R5Nb6yzGT3TTV0d/zMbWl4yajIUMd6n3EcRDPicrjnLRt7bCpHtgxoZVXVg9j1G" crossorigin="anonymous"></script> -->
 </head>
 <body>
     <div class="container">
@@ -42,7 +59,7 @@
                 <input type="text" id="dsn-input" placeholder="DSN already configured via script tag" disabled>
             </div>
             <button id="initialize-sentry">Initialize Sentry</button>
-            <div id="init-status">Status: <span>Pre-initialized with embedded DSN</span></div>
+            <div id="init-status">Status: <span>Checking Sentry status...</span></div>
         </section>
 
         <section class="error-section">
@@ -153,8 +170,26 @@
         <p>Sentry.io Testing Zone - <a href="https://github.com/KyanBasil/sentry-testing-zone" target="_blank">GitHub Repository</a></p>
     </footer>
 
+    <!-- Load our scripts at the end -->
     <script src="sentry-config.js"></script>
     <script src="error-triggers.js"></script>
     <script src="main.js"></script>
+    
+    <!-- Test error to verify Sentry is working -->
+    <script>
+      // This will generate an error that should be captured if Sentry is working properly
+      setTimeout(function() {
+        try {
+          // Intentionally cause an error after page loads
+          console.log("Testing if Sentry captures this error...");
+          nonExistentFunction();
+        } catch(e) {
+          if (typeof Sentry !== 'undefined') {
+            console.log("Captured test error with Sentry");
+            Sentry.captureException(e);
+          }
+        }
+      }, 2000);
+    </script>
 </body>
 </html>
