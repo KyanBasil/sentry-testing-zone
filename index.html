@@ -4,9 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sentry.io Testing Zone</title>
+    <!-- Sentry.io SDK with embedded DSN -->
+    <script
+      src="https://js.sentry-cdn.com/96ceb78f1b707f3de3290628be7fdf3e.min.js"
+      crossorigin="anonymous"
+    ></script>
     <link rel="stylesheet" href="styles.css">
-    <!-- Import Sentry SDK -->
-    <script src="https://browser.sentry-cdn.com/7.69.0/bundle.min.js" integrity="sha384-R5Nb6yzGT3TTV0d/zMbWl4yajIUMd6n3EcRDPicrjnLRt7bCpHtgxoZVXVg9j1G" crossorigin="anonymous"></script>
+    <!-- Backup Sentry SDK (if needed) -->
+    <!-- <script src="https://browser.sentry-cdn.com/7.69.0/bundle.min.js" integrity="sha384-R5Nb6yzGT3TTV0d/zMbWl4yajIUMd6n3EcRDPicrjnLRt7bCpHtgxoZVXVg9j1G" crossorigin="anonymous"></script> -->
 </head>
 <body>
     <div class="container">
@@ -19,10 +24,10 @@
             <h2>Configuration</h2>
             <div class="form-group">
                 <label for="dsn-input">Sentry DSN:</label>
-                <input type="text" id="dsn-input" placeholder="https://your-dsn-here@sentry.io/your-project">
+                <input type="text" id="dsn-input" placeholder="DSN already configured via script tag" disabled>
             </div>
             <button id="initialize-sentry">Initialize Sentry</button>
-            <div id="init-status">Status: <span>Not initialized</span></div>
+            <div id="init-status">Status: <span>Pre-initialized with embedded DSN</span></div>
         </section>
 
         <section class="error-section">
