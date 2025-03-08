@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentry.io Python Testing Zone</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f9f9f9;
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #6c5fc9;
+            color: white;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-color: #6c5fc9;
+            border-color: #6c5fc9;
+        }
+        .btn-primary:hover {
+            background-color: #5549a9;
+            border-color: #5549a9;
+        }
+        .btn-danger {
+            background-color: #e03e2f;
+            border-color: #e03e2f;
+        }
+        .btn-danger:hover {
+            background-color: #c43425;
+            border-color: #c43425;
+        }
+        #activity-log {
+            height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .log-info {
+            color: #0d6efd;
+        }
+        .log-success {
+            color: #198754;
+        }
+        .log-warning {
+            color: #ffc107;
+        }
+        .log-error {
+            color: #dc3545;
+        }
+        .transaction-card {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4 mb-5">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h1 class="h3 mb-0">Sentry.io Python Testing Zone</h1>
+                    </div>
+                    <div class="card-body">
+                        <p>A simple platform for testing Sentry.io features with Python integration.</p>
+                        <p>DSN: <code>https://9f4c73356acf99265361d90b06d304f3@o4508876433326080.ingest.us.sentry.io/4508939723145216</code></p>
+                        <button id="test-sentry" class="btn btn-primary">Test Sentry Connection</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Error Triggers Section -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Error Types</div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button class="btn btn-danger mb-2 w-100 trigger-error" data-error-type="division_zero">Division by Zero</button>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-danger mb-2 w-100 trigger-error" data-error-type="index_error">Index Error</button>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-danger mb-2 w-100 trigger-error" data-error-type="key_error">Key Error</button>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-danger mb-2 w-100 trigger-error" data-error-type="name_error">Name Error</button>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-danger mb-2 w-100 trigger-error" data-error-type="type_error">Type Error</button>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-danger mb-2 w-100 trigger-error" data-error-type="attribute_error">Attribute Error</button>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-danger mb-2 w-100 trigger-error" data-error-type="import_error">Import Error</button>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-danger mb-2 w-100 trigger-error" data-error-type="unhandled">Unhandled Error</button>
+                            </div>
+                            <div class="col-12">
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" id="custom-error-message" placeholder="Custom error message">
+                                    <button class="btn btn-danger trigger-error" data-error-type="custom">Custom Error</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Performance Issues</div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button class="btn btn-warning mb-2 w-100 trigger-error" data-error-type="recursive">Recursion (20 Levels)</button>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-warning mb-2 w-100 trigger-error" data-error-type="memory">Memory Intensive</button>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-warning mb-2 w-100 trigger-error" data-error-type="slow_request">Slow Request (5s)</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Context & Monitoring Section -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">User Context</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="user-id" class="form-label">User ID:</label>
+                            <input type="text" class="form-control" id="user-id" placeholder="test-user-123">
+                        </div>
+                        <div class="mb-3">
+                            <label for="user-email" class="form-label">Email:</label>
+                            <input type="email" class="form-control" id="user-email" placeholder="user@example.com">
+                        </div>
+                        <button id="set-user" class="btn btn-primary">Set User Context</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Tags & Breadcrumbs</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Set Tag:</label>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" id="tag-key" placeholder="Key (e.g., environment)">
+                                <input type="text" class="form-control" id="tag-value" placeholder="Value (e.g., testing)">
+                                <button class="btn btn-primary" id="set-tag">Set Tag</button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Add Breadcrumb:</label>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" id="breadcrumb-message" placeholder="Message">
+                                <input type="text" class="form-control" id="breadcrumb-category" placeholder="Category (e.g., ui.click)">
+                                <button class="btn btn-primary" id="add-breadcrumb">Add</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Transactions & Spans</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="transaction-name" class="form-label">Transaction Name:</label>
+                            <input type="text" class="form-control" id="transaction-name" placeholder="Test Transaction">
+                        </div>
+                        <button id="start-transaction" class="btn btn-primary">Start Transaction</button>
+                        
+                        <!-- Transaction Controls (hidden until transaction starts) -->
+                        <div id="transaction-controls" class="transaction-card mt-3">
+                            <div class="alert alert-info">
+                                Active Transaction: <span id="active-transaction-name">Test Transaction</span>
+                                <span class="badge bg-primary float-end" id="transaction-id"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label for="span-name" class="form-label">Span Name:</label>
+                                <input type="text" class="form-control" id="span-name" placeholder="Test Span">
+                            </div>
+                            <div class="mb-3">
+                                <label for="span-op" class="form-label">Operation Type:</label>
+                                <input type="text" class="form-control" id="span-op" placeholder="test.operation">
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button id="add-span" class="btn btn-primary">Add Span</button>
+                                <button id="finish-transaction" class="btn btn-warning">Finish Transaction</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Log Section -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>Activity Log</span>
+                        <button id="clear-log" class="btn btn-sm btn-secondary">Clear Log</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="activity-log"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Log function
+            function logActivity(message, level = 'info') {
+                const logElement = document.getElementById('activity-log');
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = document.createElement('p');
+                logEntry.classList.add(`log-${level}`);
+                logEntry.innerHTML = `[${timestamp}] [${level.toUpperCase()}] ${message}`;
+                logElement.appendChild(logEntry);
+                logElement.scrollTop = logElement.scrollHeight;
+                console.log(`[${level.toUpperCase()}] ${message}`);
+            }
+
+            // Transaction state
+            let activeTransactionId = null;
+
+            // Test Sentry connection
+            document.getElementById('test-sentry').addEventListener('click', function() {
+                fetch('/test_sentry', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        logActivity(data.message, 'success');
+                    } else {
+                        logActivity(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    logActivity(`Request failed: ${error}`, 'error');
+                });
+            });
+
+            // Set user context
+            document.getElementById('set-user').addEventListener('click', function() {
+                const userId = document.getElementById('user-id').value.trim();
+                const email = document.getElementById('user-email').value.trim();
+                
+                if (!userId && !email) {
+                    logActivity('Please provide at least a user ID or email', 'warning');
+                    return;
+                }
+                
+                fetch('/set_user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        email: email
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        logActivity(data.message, 'success');
+                    } else {
+                        logActivity(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    logActivity(`Request failed: ${error}`, 'error');
+                });
+            });
+
+            // Set tag
+            document.getElementById('set-tag').addEventListener('click', function() {
+                const key = document.getElementById('tag-key').value.trim();
+                const value = document.getElementById('tag-value').value.trim();
+                
+                if (!key || !value) {
+                    logActivity('Please provide both key and value for the tag', 'warning');
+                    return;
+                }
+                
+                fetch('/set_tag', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        key: key,
+                        value: value
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        logActivity(data.message, 'success');
+                    } else {
+                        logActivity(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    logActivity(`Request failed: ${error}`, 'error');
+                });
+            });
+
+            // Add breadcrumb
+            document.getElementById('add-breadcrumb').addEventListener('click', function() {
+                const message = document.getElementById('breadcrumb-message').value.trim();
+                const category = document.getElementById('breadcrumb-category').value.trim() || 'custom';
+                
+                if (!message) {
+                    logActivity('Please provide a message for the breadcrumb', 'warning');
+                    return;
+                }
+                
+                fetch('/add_breadcrumb', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        category: category
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        logActivity(data.message, 'success');
+                    } else {
+                        logActivity(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    logActivity(`Request failed: ${error}`, 'error');
+                });
+            });
+
+            // Start transaction
+            document.getElementById('start-transaction').addEventListener('click', function() {
+                const name = document.getElementById('transaction-name').value.trim() || 'Test Transaction';
+                
+                fetch('/start_transaction', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        op: 'test'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        activeTransactionId = data.transaction_id;
+                        document.getElementById('transaction-controls').style.display = 'block';
+                        document.getElementById('active-transaction-name').textContent = name;
+                        document.getElementById('transaction-id').textContent = activeTransactionId;
+                        document.getElementById('start-transaction').disabled = true;
+                        logActivity(data.message, 'success');
+                    } else {
+                        logActivity(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    logActivity(`Request failed: ${error}`, 'error');
+                });
+            });
+
+            // Add span
+            document.getElementById('add-span').addEventListener('click', function() {
+                if (!activeTransactionId) {
+                    logActivity('No active transaction. Please start a transaction first.', 'warning');
+                    return;
+                }
+                
+                const name = document.getElementById('span-name').value.trim() || 'Test Span';
+                const op = document.getElementById('span-op').value.trim() || 'test.operation';
+                
+                fetch('/add_span', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        transaction_id: activeTransactionId,
+                        name: name,
+                        op: op
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        logActivity(data.message, 'success');
+                    } else {
+                        logActivity(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    logActivity(`Request failed: ${error}`, 'error');
+                });
+            });
+
+            // Finish transaction
+            document.getElementById('finish-transaction').addEventListener('click', function() {
+                if (!activeTransactionId) {
+                    logActivity('No active transaction to finish', 'warning');
+                    return;
+                }
+                
+                fetch('/finish_transaction', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        transaction_id: activeTransactionId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        document.getElementById('transaction-controls').style.display = 'none';
+                        document.getElementById('start-transaction').disabled = false;
+                        activeTransactionId = null;
+                        logActivity(data.message, 'success');
+                    } else {
+                        logActivity(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    logActivity(`Request failed: ${error}`, 'error');
+                });
+            });
+
+            // Error triggers
+            document.querySelectorAll('.trigger-error').forEach(button => {
+                button.addEventListener('click', function() {
+                    const errorType = this.getAttribute('data-error-type');
+                    let payload = {};
+                    
+                    // For custom errors, get the message
+                    if (errorType === 'custom') {
+                        const message = document.getElementById('custom-error-message').value.trim() || 'This is a custom error';
+                        payload.message = message;
+                    }
+                    
+                    logActivity(`Triggering ${errorType} error...`, 'info');
+                    
+                    fetch(`/trigger/${errorType}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            logActivity(`${errorType} completed: ${data.message || 'Success'}`, 'success');
+                        } else if (data.status === 'error') {
+                            logActivity(`Error captured by Sentry: ${data.error_type} - ${data.message}`, 'error');
+                        } else {
+                            logActivity(`Unknown response: ${JSON.stringify(data)}`, 'warning');
+                        }
+                    })
+                    .catch(error => {
+                        logActivity(`Request failed: ${error}`, 'error');
+                    });
+                });
+            });
+
+            // Clear log
+            document.getElementById('clear-log').addEventListener('click', function() {
+                document.getElementById('activity-log').innerHTML = '';
+                logActivity('Log cleared', 'info');
+            });
+
+            // Log initial message
+            logActivity('Sentry.io Python Testing Zone loaded. Ready to test!', 'info');
+        });
+    </script>
+</body>
+</html>
