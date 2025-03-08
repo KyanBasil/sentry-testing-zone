@@ -1,39 +1,23 @@
 // Sentry configuration and initialization
-let sentryInitialized = false;
+let sentryInitialized = true; // Set to true as Sentry is pre-initialized via script tag
 let currentTransaction = null;
 
 // Initialize Sentry with provided DSN
 function initializeSentry(dsn) {
+    // If using the script tag with embedded DSN, we don't need to initialize again
     try {
-        Sentry.init({
-            dsn: dsn,
-            integrations: [
-                new Sentry.BrowserTracing(),
-                new Sentry.Replay({
-                    maskAllText: false,
-                    blockAllMedia: false,
-                }),
-            ],
-            // Performance monitoring
-            tracesSampleRate: 1.0,
-            // Session replay
-            replaysSessionSampleRate: 1.0,
-            replaysOnErrorSampleRate: 1.0,
-            // Enable debug mode for testing
-            debug: true,
-            // Environment
-            environment: 'testing',
-            // Release tracking
-            release: 'sentry-testing-zone@1.0.0',
+        // We can still set extra configuration if needed
+        Sentry.configureScope(scope => {
+            scope.setTag("manual_init", "true");
+            scope.setTag("environment", "testing");
         });
         
-        sentryInitialized = true;
-        logActivity('Sentry initialized successfully', 'success');
-        updateInitStatus('Initialized', true);
+        logActivity('Sentry already initialized with embedded DSN', 'success');
+        updateInitStatus('Using embedded DSN', true);
         return true;
     } catch (error) {
-        logActivity(`Failed to initialize Sentry: ${error.message}`, 'error');
-        updateInitStatus('Failed to initialize', false);
+        logActivity(`Sentry error: ${error.message}`, 'error');
+        updateInitStatus('Error with Sentry', false);
         return false;
     }
 }
@@ -192,3 +176,10 @@ function logActivity(message, level = 'info') {
     logElement.appendChild(logEntry);
     logElement.scrollTop = logElement.scrollHeight;
 }
+
+// Auto-initialize on document load
+document.addEventListener('DOMContentLoaded', function() {
+    // Log that we're using the embedded Sentry configuration
+    logActivity('Using embedded Sentry DSN from script tag', 'info');
+    updateInitStatus('Pre-initialized', true);
+});
