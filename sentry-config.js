@@ -1,59 +1,42 @@
 // Sentry configuration and initialization
-let sentryInitialized = false; // Will be set to true once confirmed
+// Note: Sentry is already initialized in the HTML
 
-// Wait for Sentry to be available and initialized
-document.addEventListener('DOMContentLoaded', function() {
-    // Check if Sentry is available from the loader script
-    if (typeof Sentry !== 'undefined') {
-        sentryInitialized = true;
-        logActivity('Sentry SDK loaded successfully via script tag', 'success');
-        updateInitStatus('Sentry SDK Loaded', true);
-    } else {
-        logActivity('Waiting for Sentry SDK to load...', 'info');
-        // Try again after a short delay to allow script loading
-        setTimeout(checkSentry, 500);
-    }
-});
-
-// Check if Sentry is available
-function checkSentry() {
-    if (typeof Sentry !== 'undefined') {
-        sentryInitialized = true;
-        logActivity('Sentry SDK loaded successfully', 'success');
-        updateInitStatus('Sentry SDK Loaded', true);
-    } else {
-        logActivity('Sentry SDK not available. Please check console for errors.', 'error');
-        updateInitStatus('SDK Load Error', false);
-    }
-}
+// We use this global flag
+let currentTransaction = null;
 
 // Initialize Sentry with provided DSN
 function initializeSentry(dsn) {
     // For the embedded script version, we just confirm it's working
     try {
         if (typeof Sentry === 'undefined') {
-            logActivity('Sentry SDK not loaded. Cannot initialize.', 'error');
+            logActivity('Error: Sentry SDK not found. Refresh page or check console.', 'error');
             updateInitStatus('SDK Not Found', false);
             return false;
         }
 
-        // Explicitly set initialized flag to true
-        sentryInitialized = true;
+        // Try to send a test event
+        Sentry.captureMessage("Sentry test message - initialization check");
         
         // Add a test event to confirm Sentry is working
         Sentry.addBreadcrumb({
             category: 'test',
-            message: 'Manual initialization triggered',
+            message: 'Manual initialization confirmed',
             level: 'info'
         });
+        
+        // Set some test tags
+        Sentry.setTag("test_session", "true");
+        Sentry.setTag("initialized_at", new Date().toISOString());
         
         logActivity('Sentry confirmed working and ready to capture events', 'success');
         updateInitStatus('Ready', true);
         
+        window.sentryInitialized = true;
         return true;
     } catch (error) {
         logActivity(`Error confirming Sentry: ${error.message}`, 'error');
         updateInitStatus('Error', false);
+        window.sentryInitialized = false;
         return false;
     }
 }
@@ -197,17 +180,22 @@ function finishTransaction() {
 
 // Helper to check if Sentry is initialized
 function checkSentryInitialized() {
-    if (!sentryInitialized || typeof Sentry === 'undefined') {
-        logActivity('Sentry is not initialized. Please initialize it first.', 'warning');
+    if (typeof Sentry === 'undefined') {
+        logActivity('Sentry is not initialized. Please check console.', 'warning');
         return false;
     }
+    
+    // Assume it's initialized if we got this far
     return true;
 }
 
 // Log activity to the UI
 function logActivity(message, level = 'info') {
     const logElement = document.getElementById('activity-log');
-    if (!logElement) return; // In case DOM isn't loaded yet
+    if (!logElement) {
+        console.log(`[${level.toUpperCase()}] ${message}`);
+        return;
+    }
     
     const timestamp = new Date().toLocaleTimeString();
     const logEntry = document.createElement('p');
@@ -220,5 +208,16 @@ function logActivity(message, level = 'info') {
     console.log(`[${level.toUpperCase()}] ${message}`);
 }
 
-// Initialize currentTransaction variable
-let currentTransaction = null;
+// Check Sentry on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Welcome message
+    logActivity('Welcome to Sentry.io Testing Zone', 'info');
+    
+    if (typeof Sentry !== 'undefined') {
+        logActivity('Sentry SDK detected. Click "Confirm Sentry Works" to verify', 'info');
+        updateInitStatus('SDK Detected', true);
+    } else {
+        logActivity('Sentry SDK not detected. Check console for errors', 'error');
+        updateInitStatus('SDK Not Found', false);
+    }
+});
