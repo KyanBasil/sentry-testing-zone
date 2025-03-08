@@ -5,42 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sentry.io Testing Zone</title>
     
-    <!-- Sentry.io SDK with embedded DSN - This must be the first script -->
-    <script
-      src="https://js.sentry-cdn.com/96ceb78f1b707f3de3290628be7fdf3e.min.js"
-      crossorigin="anonymous"
-    ></script>
+    <!-- Direct Sentry integration -->
+    <script src="https://browser.sentry-cdn.com/7.69.0/bundle.min.js" integrity="sha384-R5Nb6yzGT3TTV0d/zMbWl4yajIUMd6n3EcRDPicrjnLRt7bCpHtgxoZVXVg9j1G" crossorigin="anonymous"></script>
     
-    <!-- Sentry initialization - Must come right after the SDK -->
+    <!-- Sentry initialization with explicit DSN -->
     <script>
-      window.onSentryLoaded = function() {
-        console.log('Sentry loaded callback executed!');
-      };
-      
-      Sentry.onLoad(function() {
-        console.log('Sentry.onLoad callback executed!');
-        
-        Sentry.init({
-          debug: true,
-          environment: 'testing',
-          release: 'sentry-testing-zone@1.0.0',
-          tracesSampleRate: 1.0,
-          replaysSessionSampleRate: 1.0,
-          replaysOnErrorSampleRate: 1.0,
-          
-          // We'll make a global window variable to check in our scripts
-          beforeSend: function(event) {
-            window.sentryIsReady = true;
-            console.log('Sentry initialized and ready to capture events!');
-            return event;
-          }
-        });
-        
-        // Call our callback
-        if (window.onSentryLoaded) {
-          window.onSentryLoaded();
+      Sentry.init({
+        dsn: "https://96ceb78f1b707f3de3290628be7fdf3e@o4508876433326080.ingest.us.sentry.io/4508939680350208",
+        integrations: [
+          new Sentry.BrowserTracing(),
+          new Sentry.Replay({
+            maskAllText: false,
+            blockAllMedia: false,
+          }),
+        ],
+        // Performance monitoring
+        tracesSampleRate: 1.0,
+        // Session replay
+        replaysSessionSampleRate: 1.0, 
+        replaysOnErrorSampleRate: 1.0,
+        // Debug mode
+        debug: true,
+        // Environment
+        environment: 'testing',
+        // Release tracking
+        release: 'sentry-testing-zone@1.0.0',
+        beforeSend: function(event) {
+          console.log('Sentry sending event:', event);
+          window.sentryInitialized = true;
+          return event;
         }
       });
+      
+      console.log('Sentry initialized with direct DSN');
     </script>
     
     <link rel="stylesheet" href="styles.css">
@@ -56,10 +53,10 @@
             <h2>Configuration</h2>
             <div class="form-group">
                 <label for="dsn-input">Sentry DSN:</label>
-                <input type="text" id="dsn-input" placeholder="DSN already configured via script tag" disabled>
+                <input type="text" id="dsn-input" value="https://96ceb78f1b707f3de3290628be7fdf3e@o4508876433326080.ingest.us.sentry.io/4508939680350208" readonly>
             </div>
-            <button id="initialize-sentry">Initialize Sentry</button>
-            <div id="init-status">Status: <span>Checking Sentry status...</span></div>
+            <button id="initialize-sentry">Confirm Sentry Works</button>
+            <div id="init-status">Status: <span>Initialized with direct DSN</span></div>
         </section>
 
         <section class="error-section">
@@ -177,6 +174,9 @@
     
     <!-- Test error to verify Sentry is working -->
     <script>
+      // Set global flag
+      window.sentryInitialized = true;
+      
       // This will generate an error that should be captured if Sentry is working properly
       setTimeout(function() {
         try {
@@ -184,10 +184,8 @@
           console.log("Testing if Sentry captures this error...");
           nonExistentFunction();
         } catch(e) {
-          if (typeof Sentry !== 'undefined') {
-            console.log("Captured test error with Sentry");
-            Sentry.captureException(e);
-          }
+          console.log("Capturing test error with Sentry");
+          Sentry.captureException(e);
         }
       }, 2000);
     </script>
