@@ -9,6 +9,21 @@
       src="https://js.sentry-cdn.com/96ceb78f1b707f3de3290628be7fdf3e.min.js"
       crossorigin="anonymous"
     ></script>
+    <!-- Sentry initialization -->
+    <script>
+      Sentry.onLoad(function() {
+        Sentry.init({
+          // Additional configuration for Sentry
+          debug: true,
+          environment: 'testing',
+          release: 'sentry-testing-zone@1.0.0',
+          tracesSampleRate: 1.0,
+          replaysSessionSampleRate: 1.0,
+          replaysOnErrorSampleRate: 1.0
+        });
+        console.log('Sentry initialized via onLoad!');
+      });
+    </script>
     <link rel="stylesheet" href="styles.css">
     <!-- Backup Sentry SDK (if needed) -->
     <!-- <script src="https://browser.sentry-cdn.com/7.69.0/bundle.min.js" integrity="sha384-R5Nb6yzGT3TTV0d/zMbWl4yajIUMd6n3EcRDPicrjnLRt7bCpHtgxoZVXVg9j1G" crossorigin="anonymous"></script> -->
