@@ -1,23 +1,59 @@
 // Sentry configuration and initialization
-let sentryInitialized = true; // Set to true as Sentry is pre-initialized via script tag
-let currentTransaction = null;
+let sentryInitialized = false; // Will be set to true once confirmed
+
+// Wait for Sentry to be available and initialized
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if Sentry is available from the loader script
+    if (typeof Sentry !== 'undefined') {
+        sentryInitialized = true;
+        logActivity('Sentry SDK loaded successfully via script tag', 'success');
+        updateInitStatus('Sentry SDK Loaded', true);
+    } else {
+        logActivity('Waiting for Sentry SDK to load...', 'info');
+        // Try again after a short delay to allow script loading
+        setTimeout(checkSentry, 500);
+    }
+});
+
+// Check if Sentry is available
+function checkSentry() {
+    if (typeof Sentry !== 'undefined') {
+        sentryInitialized = true;
+        logActivity('Sentry SDK loaded successfully', 'success');
+        updateInitStatus('Sentry SDK Loaded', true);
+    } else {
+        logActivity('Sentry SDK not available. Please check console for errors.', 'error');
+        updateInitStatus('SDK Load Error', false);
+    }
+}
 
 // Initialize Sentry with provided DSN
 function initializeSentry(dsn) {
-    // If using the script tag with embedded DSN, we don't need to initialize again
+    // For the embedded script version, we just confirm it's working
     try {
-        // We can still set extra configuration if needed
-        Sentry.configureScope(scope => {
-            scope.setTag("manual_init", "true");
-            scope.setTag("environment", "testing");
+        if (typeof Sentry === 'undefined') {
+            logActivity('Sentry SDK not loaded. Cannot initialize.', 'error');
+            updateInitStatus('SDK Not Found', false);
+            return false;
+        }
+
+        // Explicitly set initialized flag to true
+        sentryInitialized = true;
+        
+        // Add a test event to confirm Sentry is working
+        Sentry.addBreadcrumb({
+            category: 'test',
+            message: 'Manual initialization triggered',
+            level: 'info'
         });
         
-        logActivity('Sentry already initialized with embedded DSN', 'success');
-        updateInitStatus('Using embedded DSN', true);
+        logActivity('Sentry confirmed working and ready to capture events', 'success');
+        updateInitStatus('Ready', true);
+        
         return true;
     } catch (error) {
-        logActivity(`Sentry error: ${error.message}`, 'error');
-        updateInitStatus('Error with Sentry', false);
+        logActivity(`Error confirming Sentry: ${error.message}`, 'error');
+        updateInitStatus('Error', false);
         return false;
     }
 }
@@ -25,9 +61,11 @@ function initializeSentry(dsn) {
 // Update the initialization status display
 function updateInitStatus(message, success) {
     const statusElement = document.getElementById('init-status');
-    statusElement.classList.remove('success', 'error');
-    statusElement.classList.add(success ? 'success' : 'error');
-    statusElement.querySelector('span').textContent = message;
+    if (statusElement) {
+        statusElement.classList.remove('success', 'error');
+        statusElement.classList.add(success ? 'success' : 'error');
+        statusElement.querySelector('span').textContent = message;
+    }
 }
 
 // Set user context for Sentry
@@ -159,7 +197,7 @@ function finishTransaction() {
 
 // Helper to check if Sentry is initialized
 function checkSentryInitialized() {
-    if (!sentryInitialized) {
+    if (!sentryInitialized || typeof Sentry === 'undefined') {
         logActivity('Sentry is not initialized. Please initialize it first.', 'warning');
         return false;
     }
@@ -169,17 +207,18 @@ function checkSentryInitialized() {
 // Log activity to the UI
 function logActivity(message, level = 'info') {
     const logElement = document.getElementById('activity-log');
+    if (!logElement) return; // In case DOM isn't loaded yet
+    
     const timestamp = new Date().toLocaleTimeString();
     const logEntry = document.createElement('p');
     logEntry.classList.add(level);
     logEntry.textContent = `[${timestamp}] [${level.toUpperCase()}] ${message}`;
     logElement.appendChild(logEntry);
     logElement.scrollTop = logElement.scrollHeight;
+    
+    // Also log to console for debugging
+    console.log(`[${level.toUpperCase()}] ${message}`);
 }
 
-// Auto-initialize on document load
-document.addEventListener('DOMContentLoaded', function() {
-    // Log that we're using the embedded Sentry configuration
-    logActivity('Using embedded Sentry DSN from script tag', 'info');
-    updateInitStatus('Pre-initialized', true);
-});
+// Initialize currentTransaction variable
+let currentTransaction = null;
