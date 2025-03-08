@@ -15,75 +15,96 @@ A simple Flask web application designed to help test and demonstrate Sentry.io's
 - Python 3.7+
 - pip (Python package manager)
 
-## Installation
+## Quick Start
 
-1. Clone this repository:
+### On Linux/Mac:
 ```bash
+# Clone the repository
 git clone https://github.com/KyanBasil/sentry-testing-zone.git
 cd sentry-testing-zone
+
+# Run the setup script (this will create a virtual environment, install dependencies and run the app)
+chmod +x run.sh
+./run.sh
 ```
 
-2. Create a virtual environment (optional but recommended):
+### On Windows:
+```batch
+# Clone the repository
+git clone https://github.com/KyanBasil/sentry-testing-zone.git
+cd sentry-testing-zone
+
+# Run the setup script (this will create a virtual environment, install dependencies and run the app)
+run.bat
+```
+
+### Manual Setup:
+If the scripts don't work for you, follow these manual steps:
+
 ```bash
+# Clone the repository
+git clone https://github.com/KyanBasil/sentry-testing-zone.git
+cd sentry-testing-zone
+
+# Create a virtual environment (optional but recommended)
 python -m venv venv
 source venv/bin/activate  # On Windows, use: venv\Scripts\activate
-```
 
-3. Install the required dependencies:
-```bash
+# Install the required dependencies
 pip install -r requirements.txt
-```
 
-## Usage
+# Run the setup script to ensure proper directories
+python setup.py
 
-1. Run the Flask application:
-```bash
+# Run the Flask application
 python app.py
 ```
 
-2. Open your web browser and navigate to:
+## Accessing the Application
+
+Once the application is running, open your web browser and navigate to:
 ```
 http://localhost:5000
 ```
 
-3. Use the web interface to test different Sentry features:
+## Using the Testing Zone
+
+1. **Test Sentry Connection:**
    - Click "Test Sentry Connection" to confirm integration is working
-   - Trigger various error types to see how they're captured
-   - Set user context, tags, and breadcrumbs
-   - Create transactions and spans for performance monitoring
+   - A test message will be sent to Sentry and logged in the activity log
 
-## Error Types
+2. **Trigger Errors:**
+   - Use the buttons in the "Error Types" section to trigger different Python exceptions
+   - Each error will be captured by Sentry and logged in the activity log
+   - Custom errors can be created with your own error message
 
-This application can generate the following types of errors:
+3. **Test Performance Issues:**
+   - Trigger memory-intensive operations, slow requests, or recursion
+   - Monitor performance in your Sentry dashboard
 
-### Python Exceptions
-- Division by Zero
-- Index Error
-- Key Error
-- Name Error
-- Type Error
-- Attribute Error
-- Import Error
-- Custom Exception
+4. **Add Context:**
+   - Set user context with ID and email
+   - Add custom tags to categorize events
+   - Create breadcrumbs to trace user actions
 
-### Performance Issues
-- Recursive Function Calls
-- Memory-Intensive Operations
-- Slow Requests
+5. **Monitor Transactions:**
+   - Start a transaction to measure performance
+   - Add spans to track specific operations
+   - Finish the transaction to complete the performance trace
 
-## Sentry Features
+## Troubleshooting
 
-The application demonstrates these Sentry features:
+If you encounter issues:
 
-- Exception monitoring
-- User context setting
-- Tags & custom attributes
-- Breadcrumbs
-- Performance monitoring with transactions and spans
+1. **Check the console output** for any error messages when running the Flask app
+2. **Verify your Sentry DSN** is correct in the `app.py` file
+3. **Check templates directory** exists and contains `index.html`
+4. **Verify Python version** (3.7+ required)
+5. **Check if required packages are installed** by running `pip freeze`
 
-## Sentry Configuration
+## Customizing the DSN
 
-The application is pre-configured with a Sentry DSN. If you want to use your own Sentry project:
+The application uses the pre-configured DSN in the `app.py` file. If you want to use your own Sentry project:
 
 1. Create a new project in your Sentry account
 2. Get your DSN from the project settings
