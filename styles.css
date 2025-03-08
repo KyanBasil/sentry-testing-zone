@@ -1,0 +1,232 @@
+/* Base styles */
+:root {
+    --primary-color: #362d59;
+    --secondary-color: #6c5fc9;
+    --light-color: #f4f5f7;
+    --dark-color: #2b2b2b;
+    --danger-color: #e03e2f;
+    --success-color: #57be8c;
+    --warning-color: #f9a66d;
+    --info-color: #57a9be;
+    --gray-color: #e1e4e8;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--dark-color);
+    background-color: var(--light-color);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--gray-color);
+}
+
+h1 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+h2 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--gray-color);
+}
+
+h3 {
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+}
+
+section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Form styles */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+input[type="text"],
+input[type="email"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--gray-color);
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+button {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+button:hover {
+    background-color: var(--primary-color);
+}
+
+/* Error cards */
+.error-cards,
+.context-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.error-card,
+.context-card {
+    padding: 1.5rem;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    border-left: 4px solid var(--secondary-color);
+}
+
+/* Button variants */
+.trigger-btn[data-error-type="reference"],
+.trigger-btn[data-error-type="type"],
+.trigger-btn[data-error-type="syntax"],
+.trigger-btn[data-error-type="range"] {
+    background-color: var(--danger-color);
+}
+
+.trigger-btn[data-error-type="custom"],
+.trigger-btn[data-error-type="promise"],
+.trigger-btn[data-error-type="async"] {
+    background-color: var(--warning-color);
+    color: var(--dark-color);
+}
+
+.trigger-btn[data-error-type="fetch"],
+.trigger-btn[data-error-type="xhr"] {
+    background-color: var(--info-color);
+}
+
+#initialize-sentry {
+    background-color: var(--success-color);
+}
+
+#clear-log {
+    background-color: var(--gray-color);
+    color: var(--dark-color);
+}
+
+/* Activity log */
+#activity-log {
+    height: 200px;
+    overflow-y: auto;
+    padding: 1rem;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    border: 1px solid var(--gray-color);
+    margin-bottom: 1rem;
+    font-family: monospace;
+}
+
+#activity-log p {
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px dashed var(--gray-color);
+}
+
+#activity-log .error {
+    color: var(--danger-color);
+}
+
+#activity-log .success {
+    color: var(--success-color);
+}
+
+#activity-log .info {
+    color: var(--info-color);
+}
+
+#activity-log .warning {
+    color: var(--warning-color);
+}
+
+/* Status indicators */
+#init-status {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    border-radius: 4px;
+    background-color: #f0f0f0;
+    display: inline-block;
+}
+
+#init-status span {
+    font-weight: bold;
+    color: #888;
+}
+
+#init-status.success span {
+    color: var(--success-color);
+}
+
+#init-status.error span {
+    color: var(--danger-color);
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 1rem;
+    margin-top: 2rem;
+    background-color: var(--primary-color);
+    color: white;
+}
+
+footer a {
+    color: white;
+    text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .error-cards,
+    .context-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .container {
+        padding: 1rem;
+    }
+    
+    button {
+        width: 100%;
+        margin-right: 0;
+    }
+}
