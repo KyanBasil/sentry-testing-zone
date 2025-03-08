@@ -5,19 +5,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Welcome message
     logActivity('Welcome to Sentry.io Testing Zone', 'info');
-    logActivity('Please enter your Sentry DSN and initialize Sentry to begin testing', 'info');
+    logActivity('Sentry is pre-initialized with embedded DSN. Ready to test!', 'success');
+    
+    // Call initialize to set up some default tags and show status
+    initializeSentry('embedded-dsn');
 });
 
 // Set up all event listeners
 function setupEventListeners() {
-    // Sentry initialization
+    // Sentry initialization - just a pass-through now since we're using embedded DSN
     document.getElementById('initialize-sentry').addEventListener('click', function() {
-        const dsn = document.getElementById('dsn-input').value.trim();
-        if (!dsn) {
-            logActivity('Please enter a valid Sentry DSN', 'warning');
-            return;
-        }
-        initializeSentry(dsn);
+        initializeSentry('embedded-dsn');
+        logActivity('Using pre-configured Sentry integration', 'info');
     });
     
     // Error trigger buttons
@@ -89,12 +88,6 @@ function setupEventListeners() {
 
 // Map error type to trigger function
 function triggerErrorByType(errorType) {
-    // Ensure Sentry is initialized
-    if (!checkSentryInitialized()) {
-        logActivity('Please initialize Sentry first', 'warning');
-        return;
-    }
-    
     // Add a breadcrumb for the error trigger action
     addBreadcrumb(`User triggered ${errorType} error`, 'user-action');
     
